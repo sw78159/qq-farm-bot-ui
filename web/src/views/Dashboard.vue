@@ -100,20 +100,39 @@ const logs = [
 ]
 
 const displayName = computed(() => {
+  const account = accountStore.currentAccount
+  
   // Try to use nickname from status (game server)
   const gameName = status.value?.status?.name
-  if (gameName)
+  if (gameName) {
+    // 如果有备注，显示为“昵称（备注）”
+    if (account?.name) {
+      return `${gameName} (${account.name})`
+    }
     return gameName
+  }
 
   // Check login status
   if (!status.value?.connection?.connected) {
-    const account = accountStore.currentAccount
-    return account?.name || account?.nick || '未登录'
+    if (account) {
+      // 如果有备注和昵称，显示为“昵称（备注）”
+      if (account.name && account.nick) {
+        return `${account.nick} (${account.name})`
+      }
+      return account.name || account.nick || '未登录'
+    }
+    return '未登录'
   }
 
   // Fallback to account name (usually ID) or '未命名'
-  const account = accountStore.currentAccount
-  return account?.name || account?.nick || '未命名'
+  if (account) {
+    // 如果有备注和昵称，显示为“昵称（备注）”
+    if (account.name && account.nick) {
+      return `${account.nick} (${account.name})`
+    }
+    return account.name || account.nick || '未命名'
+  }
+  return '未命名'
 })
 
 // Exp Rate & Time to Level
